@@ -142,4 +142,8 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 ---
 
-### 1.4.1.3. Unbalanced problems
+### 1.4.1.3. Unbalanced problems (불균형 문제)
+
+특정 클래스 또는 특정 개별 샘플 키워드를 더 중요하게하는 문제에서 `class_weight`와  `sample_weight` 키워드를 사용할 수 있다.
+
+`SVC`(`NuSVS` 제외)는 `fit` 메서드에서 키워드 `class_weight`를 구현했다.
