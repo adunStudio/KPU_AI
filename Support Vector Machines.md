@@ -67,7 +67,7 @@ array([1, 1]...)
 
 ---
 
-### 1.4.1.1 다중 클래스 분류
+### 1.4.1.1 Multi-class classification (다중 클래스 분류)
 
 `SVC`와 `NuSVC`는 다중 클래스 분류를 위해 "one-against-one" (Knerr et al., 1990)을 구현했다. `n_class`가 클래스의 수인 경우 `n_class * (n_class - 1) / 2`개의 분류자가 생성되고 각각은 두 클래스의 데이터를 훈련한다. 다른 분류자와 일관된 인터페이스를 제공하기 위해, `decision_function_shape` 옵션을 사용하면 "one-against-one" 분류 기준의 결과를 결정 함수의 형상`(n_samples, n_classes)`에 집계할 수 있다.
 
@@ -109,7 +109,7 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 "one-vs-rest" LinearSVC의 경우 `coef_`와 `intercept_` 속성은 각각 `[n_class, n_features]`와 `[n_class]` 형상을 갖는다. 계수의 각 행은 `n_class` 많은 "one-vs-rest" 분류자 중 하나에 해당하며, 1등급 순서로 인터셉트와 유사하다.
 
-"one-vs-one" SVC의 경우, 속성의 레이아웃이 조금 더 연관되어 있다. 선형 커널을 사용하는 경우 `coef_`와 `intercept_` 속성은 각각 `[n_class * (n_class - 1) / 2, n_features] `와 `[n_class * (n_class - 1) / 2] ` 형상을 갖는다. 이는 위에 설명된 LinearSVC의 레이아웃과 유사하며, 이제 각 행은 이진 분류기에 해당한다. 0에서 n까지의 등급은“ 0 vs 1”, “0 vs 2” , … “0 vs n”, “1 vs 2”, “1 vs 3”, “1 vs n”, . . . “n-1 vs n”이다.
+"one-vs-one" SVC의 경우, 속성의 레이아웃이 조금 더 연관되어 있다. 선형 커널을 사용하는 경우 `coef_`와 `intercept_` 속성은 각각 `[n_class * (n_class - 1) / 2, n_features] `와 `[n_class * (n_class - 1) / 2] ` 형상을 갖는다. 이는 위에 설명된 LinearSVC의 레이아웃과 유사하며, 이제 각 행은 바이너리 분류기에 해당한다. 0에서 n까지의 등급은“ 0 vs 1”, “0 vs 2” , … “0 vs n”, “1 vs 2”, “1 vs 3”, “1 vs n”, . . . “n-1 vs n”이다.
 
 `dual_coef`의 형상은 `[n_class-1, n_SV]`이며 레이아웃을 파악하기가 다소 어렵다.  열은 `n_class * (n_class - 1) / 2` "one-vs-one" 분류자에 관련된 지원 벡터에 해당한다. 각 지원 벡터는 `n_class - 1` 분류자에서 사용된다. 각 행의 `n_class - 1` 항목은 이러한 분류자에 대한 이중 계수에 해당한다.
 
@@ -134,4 +134,12 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 ---
 
-### 1.4.1.2. Scores and probabilities
+### 1.4.1.2. Scores and probabilities (점수와 확률)
+
+`SVC`와 `NuSVC`의 `decision_function` 메서드는 각 샘플에 대해 클래스당 점수를 제공한다 (또는 바이너리의 경우 샘플당 하나의 점수). 생성자 옵션 `probability`를 `True`로 설정하면 클래스 멤버 자격 추정치가 활성화 된다.(`predict_proba`와 `predict_log_proba` 메서드로부터)  바이너리 경우에는 Platt scaling을 사용하여 확률이 조정된다: SVM 점수에 대한 로지스틱 회귀 분석. 훈련 데이터에 대한 추가 교차 검증에 적합하다. 다중 클래스 경우에는 Wu등에 따라 확장된다 (2004).
+
+말할 필요도없이, Platt 스케일링과 관련된 교차 검증은 대형 데이터 세트에 대한 비용이 많이 드는 작업이다. 또한, 확률 추정치는 "argmax"가 확률의 argmax가 아닐 수도 있다는 점에서 점수와 일치하지 않을 수 있다. Platt의 방법은 이론적인 문제도 가지고 있는 것으로 알려져 있다. 신뢰 점수가 필요하지만 이 점수가 확률일 필요는 없는 경우, `probability=False`을 설정하고 `predict_proba` 대신 `decision_function`을 사용하는 것이 좋다.
+
+---
+
+### 1.4.1.3. Unbalanced problems
