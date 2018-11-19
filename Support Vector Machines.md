@@ -146,4 +146,13 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 특정 클래스 또는 특정 개별 샘플 키워드를 더 중요하게하는 문제에서 `class_weight`와  `sample_weight` 키워드를 사용할 수 있다.
 
-`SVC`(`NuSVS` 제외)는 `fit` 메서드에서 키워드 `class_weight`를 구현했다.
+`SVC`(`NuSVS` 제외)는 `fit` 메서드에서 키워드 `class_weight`를 구현했다. `{class_label : value}` 형식으 딕셔너리다. 여기서 value는	`class_label`의 매개 변수 `C`를 `C * value` 값으로 설정하는 0보다 큰 부동 소수점 숫자다.
+
+![02](https://scikit-learn.org/stable/_images/sphx_glr_plot_separating_hyperplane_unbalanced_0011.png)
+
+`SVC`, `NuSVC` , `SVR`, `NuSVB` 및 `OneClassSVM`도 키워드 `sample_wheight`를 통해 적합한 방법으로 개별 샘플에 대한 가중치를 구현했다. `class_weight`와 유사하게, 이들은 i 번째 예제의 매개 변수 C를 `C * sample_weight[i]`로 설정한다.
+
+---
+
+## 1.4.2. Regression (회귀 분석)
+
