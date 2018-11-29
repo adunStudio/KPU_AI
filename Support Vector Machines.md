@@ -146,7 +146,7 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 특정 클래스 또는 특정 개별 샘플 키워드를 더 중요하게하는 문제에서 `class_weight`와  `sample_weight` 키워드를 사용할 수 있다.
 
-`SVC`(`NuSVS` 제외)는 `fit` 메서드에서 키워드 `class_weight`를 구현했다. `{class_label : value}` 형식으 딕셔너리다. 여기서 value는	`class_label`의 매개 변수 `C`를 `C * value` 값으로 설정하는 0보다 큰 부동 소수점 숫자다.
+`SVC`(`NuSVS` 제외)는 `fit` 메서드에서 키워드 `class_weight`를 구현했다. `{class_label : value}` 형식으 딕셔너리다. 여기서 value는 `class_label`의 매개 변수 `C`를 `C * value` 값으로 설정하는 0보다 큰 부동 소수점 숫자다.
 
 ![02](https://scikit-learn.org/stable/_images/sphx_glr_plot_separating_hyperplane_unbalanced_0011.png)
 
@@ -156,3 +156,84 @@ LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
 
 ## 1.4.2. Regression (회귀 분석)
 
+회귀 문제를 해결하기 위해 SVC 메서드를 화장할 수 있다. 이 메서드를 지원 벡터 회귀 분석(Support Vector Regression)이라고 한다.
+
+지원 벡터 분류(support vector classification)에 의해 생성되는 모델은 모델을 구축하기 위한 비용 함수가 마진을 초과하는 훈련 지점에 대해서는 상관하지 않기 때문에 훈련 데이터의 하위 집합에만 의존한다. 마찬가지로 지원 벡터 회귀 분석에 의해 생성된 모델은 모델 예측에 가까운 훈련 데이터를 무시하기 때문에 훈련 데이터의 하위 집합에만 의존한다.
+
+지원 벡터 회귀 분석에는 세 가지 구현 `SVR`, `NuSVR` 및 `LinearSVR`이 있다. `LinearSVR`은 `SVR`보다 구현 속도가 빠르지만 선형 커널만 고려한다. 자세한 내용은 구현 세부 정보를 참조하면 된다.
+
+클래스 분류와 마찬가지로 `fit` 메서드는 인수 벡터 `X`, `y`로 취해지며, `y`는 정수 값 대신 부동 소수점 값을 가져야 한다.
+
+```python
+>>> from sklearn import svm
+>>> X = [[0, 0], [2, 2]]
+>>> y = [0.5, 2.5]
+>>> clf = svm.SVR()
+>>> clf.fit(X, y) 
+SVR(C=1.0, cache_size=200, coef0=0.0, degree=3, epsilon=0.1,
+    gamma='auto_deprecated', kernel='rbf', max_iter=-1, shrinking=True,
+    tol=0.001, verbose=False)
+>>> clf.predict([[1, 1]])
+array([1.5])
+```
+
+---
+
+## 1.4.3. Density estimation, novelty detection (밀도 추정, 신규성 검출)
+
+`OneClassSVM` 클래스는 특이치 탐지에 사용되는 One-Class SVM을 구현한다.
+
+`OneClassSVM`의 설명 및 사용에 대한 자세한 내용은 Novelly 및 Outlier Detection을 참조하면 된다.
+
+---
+
+## 1.4.4. Complexity (복잡성)
+
+지원 벡터 머신은 강력한 도구이지만 훈련 벡터의 수에 따라 컴퓨팅 및 스토리지 요구 사항이 급격히 증가한다. SVM의 핵심은 훈련 데이터의 나머지 부분에서 지원 벡터를 분리하는 2차 프로그래밍 문제(QP)다.
+
+또한 선형 케이스의 경우 `liblinear` 구현에 의해 `LinearSVC`에 사용된 알고리즘은 `libsvm` 기반 SVC 카운터보다 훨씬 효율적이며 수백만개의 샘플 또는 기능으로 확장할 수 있다.
+
+---
+
+## 1.4.6. Kernel functions (커널 함수)
+
+초기화 시 키워드 커널에 따라 다른 커널이 지정된다.
+
+```python
+>>> linear_svc = svm.SVC(kernel='linear')
+>>> linear_svc.kernel
+'linear'
+>>> rbf_svc = svm.SVC(kernel='rbf')
+>>> rbf_svc.kernel
+'rbf'
+```
+
+### 1.4.6.1. Custom Kernels
+
+커널을 파이썬 함수로 제공하거나 그램 행렬을 미리 계산하여 자신만의 커널을 정의할 수 있다.
+
+사용자 지정 커널을 사용하는 분류자는 다음을 제외하고 다른 분류자와 동일하게 작동한다.
+
+- 필드 `support_vectors_`가 현재 비어 있으며, 지원 벡터의 인덱스만 `support_`에 저장된다.
+- `fit()` 메서드의 첫 번째 인수의 참조가 나중에 참조할 수 있도록 저장된다. 해당 배열이 `fit()` 또는 `predict()` 메서드 사용 사이에 변경되면 예기치 않은 결과가 발생한다.
+
+#### 1.4.6.1.1. Using Python functions as kernels
+
+생성자의 키워드 커널에 함수를 전달하여 정의된 커널을 사용할 수도 있다.
+
+```python
+>>> import numpy as np
+>>> from sklearn import svm
+>>> def my_kernel(X, Y):
+...     return np.dot(X, Y.T)
+...
+>>> clf = svm.SVC(kernel=my_kernel)
+```
+
+---
+
+수학 공식과 구현 세부 사항은 아래 링크에서 확인할 수 있다.
+
+https://scikit-learn.org/stable/modules/svm.html#mathematical-formulation
+
+https://scikit-learn.org/stable/modules/svm.html#implementation-details
