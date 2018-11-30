@@ -126,3 +126,11 @@ X_test = scaler.transform(X_test)  # apply same transformation to test data
 https://scikit-learn.org/stable/modules/sgd.html#mathematical-formulation
 
 https://scikit-learn.org/stable/modules/sgd.html#implementation-details
+
+---
+
+# SVM과 기능적 차이
+
+지원 벡터 머신(SVM)은 고차원 공간에서 효과적이며, 지원 벡터에서 학습 지점의 일부를 사용하므로 효율이 높다. Sklearn의 SVM은 librinal 및 libsvm을 기반으로한다.
+
+확률적 경사 하강(SGD)은 SVM만큼 빠르지 않지만 데이터가 아주 많아서 메모리에 적재할 수 없을때 유용하다. 대용량 데이터에 대해 더 잘 확장 되고, 많은 매개 변수가 필요하다. 또한 커널을 지정할 필요가 없다.
